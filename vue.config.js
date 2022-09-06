@@ -9,7 +9,7 @@ module.exports = defineConfig({
     devServer: {
       open: true,
       host: 'localhost',
-      port: 3000
+      port: 8080
     },
     resolve: {
       alias: {
