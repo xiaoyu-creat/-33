@@ -1,6 +1,10 @@
 <template>
   <div>
-    <router-view></router-view>
+    <!-- <router-view></router-view> -->
+    <!-- 展示count -->
+    <h1>{{ count }}</h1>
+    <h1>count的10倍：{{ bigNum }}</h1>
+    <button @click="SET_COUNT(10)">点我+1</button>
   </div>
 </template>
 
@@ -36,7 +40,27 @@
 // 1.下载yarn add postcss-pxtorem
 // 2.告诉postcss，我们要使用这个插件，.postcssrc.js
 
-export default {}
+// mapState --> 将vuex里面的state映射到computed
+// 使用
+//  -引入mapState：函数，返回一个对象
+//  -参数：['映射的属性']
+
+// mapGetters -->将vuex里面getters映射到computed
+
+// mapMutations --> 将vuex的mutations方法映射到methods
+import { mapState, mapGetters, mapMutations } from 'vuex'
+export default {
+  methods: {
+    // increment() {
+    //   this.$store.commit('SET_COUNT', 10)
+    // }
+    ...mapMutations(['SET_COUNT'])
+  },
+  computed: {
+    ...mapState(['count']),
+    ...mapGetters(['bigNum'])
+  }
+}
 </script>
 
 <style scoped>
