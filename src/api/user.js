@@ -28,3 +28,16 @@ export const sendCodeAPI = (mobile) => {
     url: `/v1_0/sms/codes/${mobile}`
   })
 }
+
+/**
+ *
+ * @returns Promise
+ */
+export const getUserInfo = () => {
+  return request({
+    url: '/v1_0/user'
+    // headers: {
+    //   Authorization: `Bearer ${store.state.tokenObj.token}`
+    // }
+  })
+}

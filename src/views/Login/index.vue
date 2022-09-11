@@ -96,7 +96,7 @@ export default {
         const { data } = await login(this.mobile, this.code)
         // 将token存进vuex
         this.SET_TOKEN(data.data)
-        // 将token存进vuex
+
         this.$router.push('/profile')
         // 成功的提示
         this.$toast.success('登录成功')
