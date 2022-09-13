@@ -30,7 +30,7 @@ export const sendCodeAPI = (mobile) => {
 }
 
 /**
- *
+ * 获取用户信息
  * @returns Promise
  */
 export const getUserInfo = () => {
