@@ -23,6 +23,9 @@
         //   - eventBus 
         //   - promise 异步的时候
         // 9.promise除了链式调用之外，还可以多次调用
+        // 10.promise的链式调用
+        // 11.then方法出错，在下一个then中能够拿到错误的原因
+        // 12.then方法回调是异步的
         const PENDING = 'pending'
         const FULFILLED = 'fulfilled'
         const REJECTED = 'rejected'
@@ -55,51 +58,103 @@
             }
 
             then(onFulfilled, onRejected) {
-                if (this.status === FULFILLED) {
-                    onFulfilled(this.value)
-                }
+                const p2 = new Promise((resolve, reject) => {
+                    if (this.status === FULFILLED) {
+                        queueMicrotask(() => {
+                            try {
+                                const x = onFulfilled(this.value)
+                                resolve(x)
+                            } catch (error) {
+                                reject(error)
+                            }
+                        })
+                    }
 
-                if (this.status === REJECTED) {
-                    onRejected(this.reason)
-                }
+                    if (this.status === REJECTED) {
+                        queueMicrotask(() => {
+                            try {
+                                let x = onRejected(this.reason)
+                                resolve(x)
+                            } catch (error) {
+                                reject(error)
+                            }
+                        })
+                    }
 
-                if (this.status === PENDING) {
-                    // 异步
-                    // 订阅
-                    // this.onFulfilled = onFulfilled
-                    // this.onRejected = onRejected
-                    this.onFulfilledCallBacks.push(() => {
-                        //多写逻辑
-                        onFulfilled(this.value)
-                    })
+                    if (this.status === PENDING) {
+                        // 异步
+                        // 订阅
+                        // this.onFulfilled = onFulfilled
+                        // this.onRejected = onRejected
+                        this.onFulfilledCallBacks.push(() => {
+                            //多写逻辑
+                            queueMicrotask(() => {
+                                try {
+                                    const x = onFulfilled(this.value)
+                                    resolve(x)
+                                } catch (error) {
+                                    reject(error)
+                                }
+                            })
+                        })
 
-                    this.onRejectedCallbacks.push(() => {
-                        onRejected(this.reason)
-                    })
-                }
+                        this.onRejectedCallbacks.push(() => {
+                            queueMicrotask(() => {
+                                try {
+                                    const x = onRejected(this.reason)
+                                    resolve(x)
+                                } catch (error) {
+                                    reject(error)
+                                }
+                            })
+                        })
+                    }
+                })
+                return p2
             }
         }
 
         const p = new Promise((resolve, reject) => {
-            // reject('失败') //同步情况
-            setTimeout(() => {
-                reject('失败') //异步情况
-                // resolve('成功')
-            }, 3000)
+            reject() //同步情况
+            // setTimeout(() => {
+            //     // reject('失败') //异步情况
+            //     resolve('成功')
+            // }, 3000)
         });
 
-        // p.then(
-        //     (res) => console.log(res),
-        //     (err) => console.log(err)
+        const p1 = p.then(
+            () => {
+                return '成功'
+            },
+            () => {
+                return '失败'
+            }
+        )
+
+        p1.then(
+            (res) = console.log('第二次then的成功回调', res),
+            (error) = console.log('第二次then的成功回调', error)
+        )
+
+        // p1.then(
+        //     (res) => console.log(res, a.a),
+        //     () => { }
+        // ).then(() => { },
+        //     (err) => console.log('2', err)
         // )
 
-        p.then(
-            (res) => console.log('第一次then',res)
-        )
 
-        p.then(
-            (res) => console.log('第二次then',res)
-        )
+        // p.then(
+        //     (res) => console.log('第一次then', res)
+        // )
+
+        // p.then(
+        //     (res) => console.log('第二次then', res)
+        // )
+
+
+
+
         // const p = new Promise((resolve, reject) => {
         //     throw new Error()
         // })
