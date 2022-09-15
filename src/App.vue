@@ -1,6 +1,8 @@
 <template>
   <div>
-    <router-view></router-view>
+    <transition name="van-slide-left">
+      <router-view></router-view>
+    </transition>
   </div>
 </template>
 
